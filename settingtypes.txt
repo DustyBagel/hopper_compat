@@ -1,0 +1,5 @@
+#This makes hoppers take/give items to chest nodes that are open.
+open_chest_support (Open Chest Support) bool false
+
+#This makes hoppers take/give items to protected/locked chests. This will make locked chests able to be emptied by anyone who knows this and has a hopper. 
+protected_chest_support (Protected Chest Support) bool false
