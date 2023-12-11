@@ -10,4 +10,4 @@ If you have questions about the copyright of this mod, you can reach me at aldoe
 
 ## Acknowledgments
 
-This mod uses the api in the "hopper" mod by TenPlus1 and FaceDeer.
+This project is based on the Hoppers mod by tenplus1 and facedeer. It does have some code copied over from the hoppers mod to make the item transfer work. It also has a modified item transfer abm for handeling the item transfer between the hoppers and the connected chests. The original code can be found here: https://content.minetest.net/packages/TenPlus1/hopper/ and here https://content.minetest.net/packages/FaceDeer/hopper/. 
