@@ -368,7 +368,7 @@ minetest.register_abm({
 						end
 					end
 					
-					run_hopper_transfer_logic()
+					run_take_logic()
 				end
 			end
 		end
