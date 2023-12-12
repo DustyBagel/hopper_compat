@@ -294,9 +294,47 @@ minetest.register_abm({
 		local source_node = minetest.get_node(source_pos)
 		local destination_node = minetest.get_node(destination_pos)
 		
-		function is_neighbor()
+		local function run_hopper_transfer_logic()
+			local registered_source_inventories = hopper.get_registered_inventories_for(source_node.name)
+			if registered_source_inventories ~= nil then
+				hopper.take_item_from(pos, source_pos, source_node, registered_source_inventories["top"])
+			end
+
+			local registered_destination_inventories = hopper.get_registered_inventories_for(destination_node.name)
+			if registered_destination_inventories ~= nil then
+				if output_direction == "horizontal" then
+					hopper.send_item_to(pos, destination_pos, destination_node, registered_destination_inventories["side"])
+				else
+					hopper.send_item_to(pos, destination_pos, destination_node, registered_destination_inventories["bottom"])
+				end
+			else
+				hopper.send_item_to(pos, destination_pos, destination_node) -- for handling ejection
+			end
+		end
+		
+		local function run_send_logic()
+			local registered_destination_inventories = hopper.get_registered_inventories_for(destination_node.name)
+			if registered_destination_inventories ~= nil then
+				if output_direction == "horizontal" then
+					hopper.send_item_to(pos, destination_pos, destination_node, registered_destination_inventories["side"])
+				else
+					hopper.send_item_to(pos, destination_pos, destination_node, registered_destination_inventories["bottom"])
+				end
+			else
+				hopper.send_item_to(pos, destination_pos, destination_node) -- for handling ejection
+			end
+		end
+		
+		local function run_take_logic()
+			local registered_source_inventories = hopper.get_registered_inventories_for(source_node.name)
+			if registered_source_inventories ~= nil then
+				hopper.take_item_from(pos, source_pos, source_node, registered_source_inventories["top"])
+			end
+		end
+		
+		function is_neighbor(a)
 			for _, v in ipairs(hopper.neighbors) do
-				if v == source_node.name then
+				if v == a then
 					return true
 				end
 			end
@@ -305,9 +343,7 @@ minetest.register_abm({
 		
 		for _, data in pairs(different_nodes) do
 			if source_node.name == data[1] or destination_node.name == data[1] then
-				-- Check if the source_node is your special node
-				if destination_node.name == data[1] then
-					-- Find the position of default:chest_connected_left and set it as the destination
+				if destination_node.name == data[1] and is_neighbor(source_node.name) then
 					for _, direction in pairs(directions) do
 						local adjacent_pos = vector.add(destination_pos, direction.dst)
 						local adjacent_node = minetest.get_node(adjacent_pos)
@@ -317,10 +353,11 @@ minetest.register_abm({
 							break
 						end
 					end
+					
+					run_hopper_transfer_logic()
 				end
 		
-				if source_node.name == data[1] then
-					-- Find the position of default:chest_connected_left and set it as the destination
+				if source_node.name == data[1] and is_neighbor(destination_node.name) then
 					for _, direction in pairs(directions) do
 						local adjacent_pos = vector.add(source_pos, direction.dst)
 						local adjacent_node = minetest.get_node(adjacent_pos)
@@ -330,35 +367,8 @@ minetest.register_abm({
 							break
 						end
 					end
-				end
-				
-				if is_neighbor() then
-					local registered_destination_inventories = hopper.get_registered_inventories_for(destination_node.name)
-					if registered_destination_inventories ~= nil then
-						if output_direction == "horizontal" then
-							hopper.send_item_to(pos, destination_pos, destination_node, registered_destination_inventories["side"])
-						else
-							hopper.send_item_to(pos, destination_pos, destination_node, registered_destination_inventories["bottom"])
-						end
-					else
-						hopper.send_item_to(pos, destination_pos, destination_node) -- for handling ejection
-					end
-				else
-					local registered_source_inventories = hopper.get_registered_inventories_for(source_node.name)
-					if registered_source_inventories ~= nil then
-						hopper.take_item_from(pos, source_pos, source_node, registered_source_inventories["top"])
-					end
-		
-					local registered_destination_inventories = hopper.get_registered_inventories_for(destination_node.name)
-					if registered_destination_inventories ~= nil then
-						if output_direction == "horizontal" then
-							hopper.send_item_to(pos, destination_pos, destination_node, registered_destination_inventories["side"])
-						else
-							hopper.send_item_to(pos, destination_pos, destination_node, registered_destination_inventories["bottom"])
-						end
-					else
-						hopper.send_item_to(pos, destination_pos, destination_node) -- for handling ejection
-					end
+					
+					run_hopper_transfer_logic()
 				end
 			end
 		end
