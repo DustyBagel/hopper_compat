@@ -244,22 +244,35 @@ if minetest.get_modpath("technic_chests") then
 	end
 end
 
-function table_to_string(t, indent)
-  indent = indent or ""
-  if type(t) ~= "table" then
-    return indent .. tostring(t)
-  end
-
-  local result = {}
-  for k, v in pairs(t) do
-    table.insert(result, indent .. k .. ":\n" .. table_to_string(v, indent .. "  "))
-  end
-  return table.concat(result, "\n")
-end
-
 local node_neighbors = {}
 for _, pair in ipairs(different_nodes) do
     table.insert(node_neighbors, pair[1])
+end
+
+local near_nodes = {
+    {x = 0, y = 1, z = 0},
+    {x = 0, y = -1, z = 0},
+    {x = 0, y = 0, z = 1},
+    {x = 0, y = 0, z = -1},
+    {x = 1, y = 0, z = 0},
+    {x = -1, y = 0, z = 0}
+}
+
+local function get_near_nodes(pos)
+    local near_positions = {}
+    for _, direction in ipairs(near_nodes) do
+        table.insert(near_positions, vector.add(pos, direction))
+    end
+    return near_positions
+end
+
+function is_neighbor(a)
+	for _, v in ipairs(hopper.neighbors) do
+		if v == a then
+			return true
+		end
+	end
+	return false
 end
 
 --[[The abm code is modified by me but the original code is from the hoppers mod by tenplus1 and facedeer. The original code can be found here 
@@ -269,7 +282,138 @@ https://content.minetest.net/packages/TenPlus1/hopper/ and here https://content.
 minetest.register_abm({
 	label = "Hopper transfer",
 	nodenames = {"hopper:hopper", "hopper:hopper_side"},
-	neighbors = node_neighbors,
+	interval = 1.0,
+	chance = 1.0,
+	catch_up = false,
+
+	action = function(pos, node, active_object_count, active_object_count_wider)
+		local near_nodes = get_near_nodes(pos)
+        for _, near_pos in ipairs(near_nodes) do
+			local source_pos, destination_pos, destination_dir
+			if node.name == "hopper:hopper_side" then
+				source_pos = vector.add(pos, directions[node.param2].src)
+				destination_dir = directions[node.param2].dst
+				destination_pos = vector.add(pos, destination_dir)
+			else
+				destination_dir = bottomdir(node.param2)
+				source_pos = vector.subtract(pos, destination_dir)
+				destination_pos = vector.add(pos, destination_dir)
+			end
+		
+			local output_direction
+			if destination_dir.y == 0 then
+				output_direction = "horizontal"
+			end
+		
+			local source_node = minetest.get_node(source_pos)
+			local destination_node = minetest.get_node(destination_pos)
+			
+            local node = minetest.get_node(near_pos)
+				local function run_hopper_transfer_logic()
+					local registered_source_inventories = hopper.get_registered_inventories_for(source_node.name)
+					if registered_source_inventories ~= nil then
+						hopper.take_item_from(pos, source_pos, source_node, registered_source_inventories["top"])
+					end
+
+					local registered_destination_inventories = hopper.get_registered_inventories_for(destination_node.name)
+					if registered_destination_inventories ~= nil then
+						if output_direction == "horizontal" then
+							hopper.send_item_to(pos, destination_pos, destination_node, registered_destination_inventories["side"])
+						else
+							hopper.send_item_to(pos, destination_pos, destination_node, registered_destination_inventories["bottom"])
+						end
+					else
+						hopper.send_item_to(pos, destination_pos, destination_node) -- for handling ejection
+					end
+				end
+		
+				local function run_send_logic()
+					local registered_destination_inventories = hopper.get_registered_inventories_for(destination_node.name)
+					if registered_destination_inventories ~= nil then
+						if output_direction == "horizontal" then
+							hopper.send_item_to(pos, destination_pos, destination_node, registered_destination_inventories["side"])
+						else
+							hopper.send_item_to(pos, destination_pos, destination_node, registered_destination_inventories["bottom"])
+						end
+					else
+						hopper.send_item_to(pos, destination_pos, destination_node) -- for handling ejection
+					end
+				end
+		
+				local function run_take_logic()
+				local registered_source_inventories = hopper.get_registered_inventories_for(source_node.name)
+				if registered_source_inventories ~= nil then
+					hopper.take_item_from(pos, source_pos, source_node, registered_source_inventories["top"])
+				end
+			end
+		
+			for _, data in pairs(different_nodes) do
+				if source_node.name == data[1] or destination_node.name == data[1] then
+					if destination_node.name == data[1] and is_neighbor(source_node.name) then
+						for _, direction in pairs(directions) do
+							local adjacent_pos = vector.add(destination_pos, direction.dst)
+							local adjacent_node = minetest.get_node(adjacent_pos)
+							if adjacent_node.name == data[2] then
+								destination_node = adjacent_node
+								destination_pos = adjacent_pos
+								break
+							end
+						end
+				
+						run_send_logic()
+					end
+		
+					if source_node.name == data[1] and is_neighbor(destination_node.name) then
+						for _, direction in pairs(directions) do
+							local adjacent_pos = vector.add(source_pos, direction.dst)
+							local adjacent_node = minetest.get_node(adjacent_pos)
+							if adjacent_node.name == data[2] then
+								source_node = adjacent_node
+								source_pos = adjacent_pos
+								break
+							end
+						end
+						run_take_logic()
+					end
+								
+					if not is_neighbor(source_node.name) and destination_node.name == data[1] then
+						for _, direction in pairs(directions) do
+							local adjacent_pos = vector.add(destination_pos, direction.dst)
+							local adjacent_node = minetest.get_node(adjacent_pos)
+							if adjacent_node.name == data[2] then
+							destination_node = adjacent_node
+								destination_pos = adjacent_pos
+								break
+							end
+						end
+						run_hopper_transfer_logic()
+					end
+				
+					if not is_neighbor(destination_node.name) and source_node.name == data[1] then
+						for _, direction in pairs(directions) do
+							local adjacent_pos = vector.add(source_pos, direction.dst)
+							local adjacent_node = minetest.get_node(adjacent_pos)
+							if adjacent_node.name == data[2] then
+								source_node = adjacent_node
+								source_pos = adjacent_pos
+								break
+							end
+						end
+				
+						run_take_logic()
+					end
+				end			
+			end
+			break
+        end
+	end,
+})
+
+
+minetest.register_abm({
+	label = "Hopper transfer",
+	nodenames = {"hopper:hopper", "hopper:hopper_side"},
+	neighbors = ndde_neighbors, neighbors,
 	interval = 1.0,
 	chance = 1.0,
 	catch_up = false,
@@ -341,36 +485,8 @@ minetest.register_abm({
 			return false
 		end
 		
-		for _, data in pairs(different_nodes) do
-			if source_node.name == data[1] or destination_node.name == data[1] then
-				if destination_node.name == data[1] and is_neighbor(source_node.name) then
-					for _, direction in pairs(directions) do
-						local adjacent_pos = vector.add(destination_pos, direction.dst)
-						local adjacent_node = minetest.get_node(adjacent_pos)
-						if adjacent_node.name == data[2] then
-							destination_node = adjacent_node
-							destination_pos = adjacent_pos
-							break
-						end
-					end
-					
-					run_hopper_transfer_logic()
-				end
-		
-				if source_node.name == data[1] and is_neighbor(destination_node.name) then
-					for _, direction in pairs(directions) do
-						local adjacent_pos = vector.add(source_pos, direction.dst)
-						local adjacent_node = minetest.get_node(adjacent_pos)
-						if adjacent_node.name == data[2] then
-							source_node = adjacent_node
-							source_pos = adjacent_pos
-							break
-						end
-					end
-					
-					run_take_logic()
-				end
-			end
+		if not is_neighbor(source_node.name) and not is_neighbor(destination_node.name) then 
+			run_send_logic()
 		end
 	end,
 })
