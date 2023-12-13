@@ -75,65 +75,7 @@ if minetest.settings:get_bool("open_chest_support") or false then
 	})
 end
 
---Add connected chests support.
-if minetest.get_modpath("connected_chests") then
-	hopper:add_container({
-		{"top", "default:chest_connected_left", "main"}, 
-		{"bottom", "default:chest_connected_left", "main"},
-		{"side", "default:chest_connected_left", "main"}, 
-
-		{"top", "default:chest_connected_right", "main"}, 
-		{"bottom", "default:chest_connected_right", "main"},
-		{"side", "default:chest_connected_right", "main"},
-	})
-
-	add_node("default:chest_connected_right", "default:chest_connected_left")
-	
-	if minetest.settings:get_bool("open_chest_support") or false then
-		hopper:add_container({
-			{"top", "default:chest_connected_left_open", "main"}, 
-			{"bottom", "default:chest_connected_left_open", "main"},
-			{"side", "default:chest_connected_left_open", "main"}, 
-		
-			{"top", "default:chest_connected_right_open", "main"}, 
-			{"bottom", "default:chest_connected_right_open", "main"},
-			{"side", "default:chest_connected_right_open", "main"}, 
-		})
-		
-		add_node("default:chest_connected_right_open", "default:chest_connected_left_open")
-	end
-		
-	if minetest.settings:get_bool("protected_chest_support") or false then
-		hopper:add_container({
-			{"top", "default:chest_locked_connected_left", "main"}, 
-			{"bottom", "default:chest_locked_connected_left", "main"},
-			{"side", "default:chest_locked_connected_left", "main"}, 
-
-			{"top", "default:chest_locked_connected_right", "main"}, 
-			{"bottom", "default:chest_locked_connected_right", "main"},
-			{"side", "default:chest_locked_connected_right", "main"}, 
-		})
-			
-		add_node("default:chest_locked_connected_right", "default:chest_locked_connected_left")
-			
-		if minetest.settings:get_bool("open_chest_support") or false then
-			hopper:add_container({
-				{"top", "default:chest_locked_connected_left_open", "main"}, 
-				{"bottom", "default:chest_locked_connected_left_open", "main"},
-				{"side", "default:chest_locked_connected_left_open", "main"}, 
-
-				{"top", "default:chest_locked_connected_right_open", "main"}, 
-				{"bottom", "default:chest_locked_connected_right_open", "main"},
-				{"side", "default:chest_locked_connected_right_open", "main"}, 
-			})
-			
-			add_node("default:chest_locked_connected_right_open", "default:chest_locked_connected_left_open")
-		end
-	end
-end
-
 --This adds support for elepower stuff
-
 if minetest.get_modpath("elepower_machines") then
 	hopper:add_container({
 		{"top", "elepower_machines:alloy_furnace", "dst"}, 
@@ -244,7 +186,66 @@ if minetest.get_modpath("technic_chests") then
 	end
 end
 
-if minetest.getmodpath("connected_chests") then
+--Add connected chests support.
+if minetest.registered_nodes["hopper:hopper_void"] then 
+	minetest.register_on_newplayer(function(player)
+   	     minetest.chat_send_player(player:get_player_name(), "Hopper compatibility doesn't work with this version of the hoppers mod. The right version can be found here: https://content.minetest.net/packages/FaceDeer/hopper/.")
+	end
+elseif minetest.get_modpath("connected_chests") then
+	hopper:add_container({
+		{"top", "default:chest_connected_left", "main"}, 
+		{"bottom", "default:chest_connected_left", "main"},
+		{"side", "default:chest_connected_left", "main"}, 
+
+		{"top", "default:chest_connected_right", "main"}, 
+		{"bottom", "default:chest_connected_right", "main"},
+		{"side", "default:chest_connected_right", "main"},
+	})
+
+	add_node("default:chest_connected_right", "default:chest_connected_left")
+	
+	if minetest.settings:get_bool("open_chest_support") or false then
+		hopper:add_container({
+			{"top", "default:chest_connected_left_open", "main"}, 
+			{"bottom", "default:chest_connected_left_open", "main"},
+			{"side", "default:chest_connected_left_open", "main"}, 
+		
+			{"top", "default:chest_connected_right_open", "main"}, 
+			{"bottom", "default:chest_connected_right_open", "main"},
+			{"side", "default:chest_connected_right_open", "main"}, 
+		})
+		
+		add_node("default:chest_connected_right_open", "default:chest_connected_left_open")
+	end
+		
+	if minetest.settings:get_bool("protected_chest_support") or false then
+		hopper:add_container({
+			{"top", "default:chest_locked_connected_left", "main"}, 
+			{"bottom", "default:chest_locked_connected_left", "main"},
+			{"side", "default:chest_locked_connected_left", "main"}, 
+
+			{"top", "default:chest_locked_connected_right", "main"}, 
+			{"bottom", "default:chest_locked_connected_right", "main"},
+			{"side", "default:chest_locked_connected_right", "main"}, 
+		})
+			
+		add_node("default:chest_locked_connected_right", "default:chest_locked_connected_left")
+			
+		if minetest.settings:get_bool("open_chest_support") or false then
+			hopper:add_container({
+				{"top", "default:chest_locked_connected_left_open", "main"}, 
+				{"bottom", "default:chest_locked_connected_left_open", "main"},
+				{"side", "default:chest_locked_connected_left_open", "main"}, 
+
+				{"top", "default:chest_locked_connected_right_open", "main"}, 
+				{"bottom", "default:chest_locked_connected_right_open", "main"},
+				{"side", "default:chest_locked_connected_right_open", "main"}, 
+			})
+			
+			add_node("default:chest_locked_connected_right_open", "default:chest_locked_connected_left_open")
+		end
+	end
+
 	local node_neighbors = {}
 	for _, pair in ipairs(different_nodes) do
 		table.insert(node_neighbors, pair[1])
