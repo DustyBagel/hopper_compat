@@ -39,21 +39,6 @@ end
 
 --The rest of the code is mine exept for the abm which I modified from the hoppers mod.
 
-local different_nodes = {}
-
-local function add_node(node, replace_with_node)
-	table.insert(different_nodes, {node, replace_with_node})
-end
-
---Function for removeing the default:chest_locked from the hoppers tables so that they don't work when the protected_chest_support is not enabled.
-local function remove_hopper_support(t, sub)
-    for k, _ in pairs(t) do
-        if k == sub then
-            t[k] = nil
-        end
-    end
-end
-
 if minetest.settings:get_bool("protected_chest_support") or false then
 	hopper:add_container({
 		{"top", "default:chest_locked_open", "main"},
