@@ -60,9 +60,6 @@ if minetest.settings:get_bool("protected_chest_support") or false then
 		{"side", "default:chest_locked_open", "main"},
 		{"bottom", "default:chest_locked_open", "main"},
 	})
-else
-	--We need to remove the default:chest_locked node from the hopper.containers table because it is added in the hoppers mod and we don't want it to work with hoppers when the setting for that is disabled because it is a security risk for any server to have locked chests be able to be emptied by anyone with a hopper.
-	remove_hopper_support(hopper.containers, "default:chest_locked")
 end
 	
 
@@ -192,6 +189,28 @@ if minetest.registered_nodes["hopper:hopper_void"] then
    	     minetest.chat_send_player(player:get_player_name(), "Hopper compatibility doesn't work with this version of the hoppers mod. The right version can be found here: https://content.minetest.net/packages/FaceDeer/hopper/.")
 	end)
 elseif minetest.get_modpath("connected_chests") then
+	local different_nodes = {}
+
+	local function add_node(node, replace_with_node)
+		table.insert(different_nodes, {node, replace_with_node})
+	end
+
+	--Function for removeing the default:chest_locked from the hoppers tables so that they don't work when the protected_chest_support is not enabled.
+	local function remove_hopper_support(t, sub)
+ 	   for k, _ in pairs(t) do
+  	      if k == sub then
+  	          t[k] = nil
+   	     end
+  	  end
+	end
+	
+	if minetest.settings:get_bool("protected_chest_support") == false or false then
+		--We need to remove the default:chest_locked node from the hopper.containers table because it is added in the hoppers mod and we don't want it to work with hoppers when the setting for that is disabled because it is a security risk for any server to have locked chests be able to be emptied by anyone with a hopper.
+		remove_hopper_support(hopper.containers, "default:chest_locked")
+	end
+
+
+	
 	hopper:add_container({
 		{"top", "default:chest_connected_left", "main"}, 
 		{"bottom", "default:chest_connected_left", "main"},
