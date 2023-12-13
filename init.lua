@@ -170,9 +170,11 @@ end
 
 --Add connected chests support.
 if minetest.registered_nodes["hopper:hopper_void"] then 
-	minetest.register_on_newplayer(function(player)
-   	     minetest.chat_send_player(player:get_player_name(), "Hopper compatibility doesn't work with this version of the hoppers mod. The right version can be found here: https://content.minetest.net/packages/FaceDeer/hopper/.")
-	end)
+	if minetest.Settings:get_bool("warning_message") or true then
+		minetest.register_on_newplayer(function(player)
+   	 	    minetest.chat_send_player(player:get_player_name(), "Hopper compatibility doesn't work with this version of the hoppers mod. The right version can be found here: https://content.minetest.net/packages/FaceDeer/hopper/.")
+		end)
+	end
 elseif minetest.get_modpath("connected_chests") then
 	local different_nodes = {}
 
