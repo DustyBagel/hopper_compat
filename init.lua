@@ -1,5 +1,5 @@
 --[[Tables to make the abms work. This code belongs to tenplus1 and facedeer. The original code can be found here 
-https://content.minetest.net/packages/TenPlus1/hopper/ and here https://content.minetest.net/packages/FaceDeer/hopper/ .]]
+https://content.minetest.net/packages/FaceDeer/hopper/ .]]
 
 local directions = {
 	[0]={["src"]={x=0, y=1, z=0},["dst"]={x=-1, y=0, z=0}},
@@ -276,8 +276,7 @@ if minetest.getmodpath("connected_chests") then
 		return false
 	end
 
-	--[[The abm code is modified by me but the original code is from the hoppers mod by tenplus1 and facedeer. The original code can be found here 
-	https://content.minetest.net/packages/TenPlus1/hopper/ and here https://content.minetest.net/packages/FaceDeer/hopper/ .]]
+	--[[The abm code is modified by me but the original code is from the hoppers mod by tenplus1 and facedeer. The original code can be found here https://content.minetest.net/packages/FaceDeer/hopper/ .]]
 
 	--hopper workings
 	minetest.register_abm({
