@@ -1,7 +1,7 @@
 #This makes hoppers take/give items to chest nodes that are open.
 open_chest_support (Open Chest Support) bool false
 
-#This makes hoppers take/give items to protected/locked chests. This will make locked chests able to be emptied by anyone who knows this and has a hopper. 
+#This setting is for making hoppers work with locked chests. Enabling it shouldn't cause any problems, however it is possible it could allow for just anyone to take items out of any locked chest. It needs to be tested more. 
 protected_chest_support (Protected Chest Support) bool false
 
 #This setting is for the message that appears when you have the wrong hopper mod installed
