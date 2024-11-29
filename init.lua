@@ -28,8 +28,8 @@ if minetest.get_modpath("elepower_machines") then
 		{"side", "elepower_machines:canning_machine", "dst"},
 		{"bottom", "elepower_machines:canning_machine", "src"},
 
-		{"top", "elepower_machines:coal_alloy_furnace", "fuel"}, 
-		{"bottom", "elepower_machines:coal_alloy_furnace", "fuel"},
+		{"top", "elepower_machines:coal_alloy_furnace", "dst"}, 
+		{"bottom", "elepower_machines:coal_alloy_furnace", "srt"},
 		{"side", "elepower_machines:coal_alloy_furnace", "fuel"}, 
 
 		{"top", "elepower_machines:compressor", "dst"}, 
