@@ -47,7 +47,7 @@ if minetest.get_modpath("elepower_machines") then
 		{"side", "elepower_machines:generator_active", "src"}, 
 
 		{"top", "elepower_machines:grindstone", "dst"}, 
-		{"side", "elepower_machines:grindstone", "dst"},
+		{"side", "elepower_machines:grindstone", "src"},
 		{"bottom", "elepower_machines:grindstone", "src"},
 
 		{"top", "elepower_machines:pcb_plant", "dst"}, 
