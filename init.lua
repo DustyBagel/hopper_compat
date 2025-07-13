@@ -3,7 +3,8 @@
 
 -- TO DO: Add connected_chests support for tenplus1's version of hopper.
 
---Make the hoppers work with a chest when it is open
+-- Make the hoppers work with a chest when it is open because
+-- for some reason the hopper mod doesn't do that?
 if minetest.settings:get_bool("open_chest_support") or true then
 	hopper:add_container({
 		{"top", "default:chest_open", "main"},
@@ -13,7 +14,6 @@ if minetest.settings:get_bool("open_chest_support") or true then
 end
 
 -- Add support for elepoer stuff.
-
 if minetest.get_modpath("elepower_machines") then
 	hopper:add_container({
 		{"top", "elepower_machines:alloy_furnace", "dst"}, 
@@ -28,8 +28,8 @@ if minetest.get_modpath("elepower_machines") then
 		{"side", "elepower_machines:canning_machine", "dst"},
 		{"bottom", "elepower_machines:canning_machine", "src"},
 
-		{"top", "elepower_machines:coal_alloy_furnace", "dst"}, 
-		{"bottom", "elepower_machines:coal_alloy_furnace", "srt"},
+		{"top", "elepower_machines:coal_alloy_furnace", "fuel"}, 
+		{"bottom", "elepower_machines:coal_alloy_furnace", "fuel"},
 		{"side", "elepower_machines:coal_alloy_furnace", "fuel"}, 
 
 		{"top", "elepower_machines:compressor", "dst"}, 
@@ -75,7 +75,6 @@ if minetest.get_modpath("elepower_machines") then
 end
 
 -- Add Support for techinc chests.
-
 if minetest.get_modpath("technic_chests") then
 	hopper:add_container({
 		{"top", "technic:iron_chest", "main"}, 
@@ -97,5 +96,22 @@ if minetest.get_modpath("technic_chests") then
 		{"top", "technic:mithril_chest", "main"}, 
 		{"bottom", "technic:mithril_chest", "main"},
 		{"side", "technic:mithril_chest", "main"}, 
+	})
+end
+
+if minetest.get_modpath("technic") then
+	hopper:add_container({
+		{"top", "technic:injector", "main"}, 
+		{"bottom", "technic:injector", "main"},
+		{"side", "technic:injector", "main"}, 
+	})
+end
+
+-- Add support for pipeworks autocrafter.
+if minetest.get_modpath("pipeworks") then
+	hopper:add_container({
+		{"top", "pipeworks:autocrafter", "dst"}, 
+		{"bottom", "pipeworks:autocrafter", "src"},
+		{"side", "pipeworks:autocrafter", "src"},
 	})
 end
